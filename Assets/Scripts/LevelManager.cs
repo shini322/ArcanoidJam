@@ -9,21 +9,22 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private List<Level> levelsPrefabs;
 
     public event Action<int> OnLevelChanged;
+    public event Action OnBlockDestroy;
     public event Action OnAllLevelsCompleted;
 
     public int LevelsCount => levels.Count;
+    public int CurrentLevelBlocks { get; private set; }
+    public Level CurrentLevel { get; private set; }
     
     private List<Level> levels = new ();
     private int currentLevelIndex = 0;
-    private Level currentLevel;
-    private int currentLevelBlocks;
     
     private void Awake()
     {
         levels = new();
         currentLevelIndex = 0;
-        currentLevel = null;
-        currentLevelBlocks = 0;
+        CurrentLevel = null;
+        CurrentLevelBlocks = 0;
         InitInstance();
         InitLevels();
         InitNextLevel();
@@ -49,23 +50,24 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
-        if (currentLevel != null)
+        if (CurrentLevel != null)
         {
-            currentLevel.gameObject.SetActive(false);
+            CurrentLevel.gameObject.SetActive(false);
         }
 
-        currentLevel = levels[currentLevelIndex];
-        currentLevel.gameObject.SetActive(true);
-        currentLevelBlocks = currentLevel.BlocksCount;
+        CurrentLevel = levels[currentLevelIndex];
+        CurrentLevel.gameObject.SetActive(true);
+        CurrentLevelBlocks = CurrentLevel.BlocksCount;
         currentLevelIndex += 1;
         OnLevelChanged?.Invoke(currentLevelIndex);
     }
 
     public void BlockDestroy()
     {
-        currentLevelBlocks -= 1;
+        CurrentLevelBlocks -= 1;
+        OnBlockDestroy?.Invoke();
 
-        if (currentLevelBlocks <= 0)
+        if (CurrentLevelBlocks <= 0)
         {
             InitNextLevel();
         }

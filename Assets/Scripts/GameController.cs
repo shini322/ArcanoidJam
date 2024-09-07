@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [DefaultExecutionOrder(-25)]
@@ -9,6 +10,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private int health;
     [SerializeField] private GameObject winCanvas;
     [SerializeField] private GameObject loseCanvas;
+    [field:SerializeField] public List<Transform> GoslingPoints { get; private set; }
+    [field:SerializeField] public Transform GoslingCenter { get; private set; }
 
     public event Action OnPlayerHealthChanged;
 
@@ -64,4 +67,5 @@ public class GameController : MonoBehaviour
         player.gameObject.SetActive(false);
         ball.gameObject.SetActive(false);
     }
+    
 }

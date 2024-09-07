@@ -13,14 +13,19 @@ public class Block : MonoBehaviour
     {
         if (collision.collider.TryGetComponent(out Ball ball))
         {
-            health -= 1;
-            OnHealthChanged?.Invoke();
+            GetDamage();
+        }
+    }
 
-            if (health <= 0)
-            {
-                Destroy(gameObject);
-                LevelManager.Instance.BlockDestroy();
-            }
+    public void GetDamage()
+    {
+        health -= 1;
+        OnHealthChanged?.Invoke();
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+            LevelManager.Instance.BlockDestroy();
         }
     }
 }

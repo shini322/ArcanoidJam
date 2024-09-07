@@ -15,6 +15,11 @@ public class Ball : MonoBehaviour
         InitRb();
     }
 
+    private void Update()
+    {
+        rb.linearVelocity = rb.linearVelocity.normalized * speed;
+    }
+
     public void ChangeVelocity(Vector2 velocity)
     {
         rb.linearVelocity = velocity.normalized * speed;

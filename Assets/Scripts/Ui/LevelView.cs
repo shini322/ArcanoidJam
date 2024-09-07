@@ -3,19 +3,22 @@ using UnityEngine;
 
 public class LevelView : MonoBehaviour
 {
-    private TextMeshProUGUI text;
+    [SerializeField] private TextMeshProUGUI textBlocksCount;
+    
+    private TextMeshProUGUI textLevel;
     private int levelsCount;
 
     private void Awake()
     {
         levelsCount = LevelManager.Instance.LevelsCount;
-        text = GetComponent<TextMeshProUGUI>();
+        textLevel = GetComponent<TextMeshProUGUI>();
         ChangeLevel(1);
     }
 
     private void OnEnable()
     {
         LevelManager.Instance.OnLevelChanged += ChangeLevel;
+        LevelManager.Instance.OnBlockDestroy += ChangeBlocksCount;
     }
     
     private void OnDisable()
@@ -25,6 +28,12 @@ public class LevelView : MonoBehaviour
 
     private void ChangeLevel(int levelNumber)
     {
-        text.text = $"Уровень {levelNumber}/{levelsCount}";
+        textLevel.text = $"Уровень {levelNumber}/{levelsCount}";
+        ChangeBlocksCount();
+    }
+
+    private void ChangeBlocksCount()
+    {
+        textBlocksCount.text = $"Блоков осталось: {LevelManager.Instance.CurrentLevelBlocks}";
     }
 }
