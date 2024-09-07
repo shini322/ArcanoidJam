@@ -1,23 +1,34 @@
+using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private Ball ballPrefab;
+    [SerializeField] private Ball ball;
     [SerializeField] private float speed;
     [SerializeField] private Transform ballStartTransform;
 
     private Rigidbody2D rb;
     private BoxCollider2D collider;
     private bool ballWasLaunched = false;
-    private Ball ball;
     
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         collider = GetComponent<BoxCollider2D>();
-        ball = Instantiate(ballPrefab, transform, true);
         ball.transform.position = ballStartTransform.position;
         ball.Catch(transform);
+    }
+
+    private void OnEnable()
+    {
+        ball.OnDie += ResetBall;
+        LevelManager.Instance.OnLevelChanged += LevelChanged;
+    }
+
+    private void OnDisable()
+    {
+        ball.OnDie -= ResetBall;
+        LevelManager.Instance.OnLevelChanged -= LevelChanged;
     }
 
     private void Update()
@@ -28,12 +39,6 @@ public class PlayerMovement : MonoBehaviour
         {
             ball.Launch(new Vector2(1, 4));
             ballWasLaunched = true;
-        }
-        
-        // todo Для теста
-        if (Input.GetKey(KeyCode.Q))
-        {
-            ResetBall();
         }
     }
 
@@ -52,5 +57,10 @@ public class PlayerMovement : MonoBehaviour
         ball.gameObject.SetActive(true);
         ball.transform.position = ballStartTransform.position;
         ball.Catch(transform);
+    }
+
+    private void LevelChanged(int _)
+    {
+        ResetBall();
     }
 }

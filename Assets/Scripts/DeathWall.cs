@@ -6,7 +6,7 @@ public class DeathWall : MonoBehaviour
     {
         if (collision.collider.TryGetComponent(out Ball ball))
         {
-            ball.gameObject.SetActive(false);
+            ball.Die();
         }
     }
 }

@@ -6,11 +6,13 @@ public class Ball : MonoBehaviour
 {
     [SerializeField] private float speed;
 
+    public event Action OnDie; 
+    
     private Rigidbody2D rb;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        InitRb();
     }
 
     public void ChangeVelocity(Vector2 velocity)
@@ -20,6 +22,11 @@ public class Ball : MonoBehaviour
 
     public void Catch(Transform parent)
     {
+        if (!rb)
+        {
+            InitRb();
+        }
+
         rb.simulated = false;
         rb.transform.parent = parent;
         ChangeVelocity(Vector2.zero);
@@ -27,8 +34,23 @@ public class Ball : MonoBehaviour
 
     public void Launch(Vector2 direction)
     {
+        if (!rb)
+        {
+            InitRb();
+        }
+
         rb.simulated = true;
         rb.transform.parent = null;
         ChangeVelocity(direction.normalized);
+    }
+
+    public void Die()
+    {
+        OnDie?.Invoke();
+    }
+
+    private void InitRb()
+    {
+        rb = GetComponent<Rigidbody2D>();
     }
 }
