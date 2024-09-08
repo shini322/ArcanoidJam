@@ -36,7 +36,7 @@ public class LevelManager : MonoBehaviour
     {
         foreach (Level levelPrefab in levelsPrefabs)
         {
-            var level = Instantiate(levelPrefab, Vector3.zero, Quaternion.identity);
+            var level = Instantiate(levelPrefab, Vector3.zero, Quaternion.identity, transform);
             level.gameObject.SetActive(false);
             levels.Add(level);
         }

@@ -34,6 +34,6 @@ public class LevelView : MonoBehaviour
 
     private void ChangeBlocksCount()
     {
-        textBlocksCount.text = $"Блоков осталось: {LevelManager.Instance.CurrentLevelBlocks}";
+        textBlocksCount.text = $"Блоки {LevelManager.Instance.CurrentLevelBlocks}";
     }
 }

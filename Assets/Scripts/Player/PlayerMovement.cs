@@ -10,6 +10,8 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D collider;
     private bool ballWasLaunched = false;
+    private bool isLeftSide;
+    private bool isRightSide;
     
     private void Awake()
     {
@@ -42,15 +44,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.collider.TryGetComponent(out Ball ball))
-        {
-            float relativePosition = (ball.transform.position.x - transform.position.x) / collider.bounds.size.x;
-            ball.ChangeVelocity(new Vector2(relativePosition, 1).normalized * other.rigidbody.linearVelocity.magnitude);
-        }
-    }
-
     public void ResetBall()
     {
         ballWasLaunched = false;
@@ -62,5 +55,48 @@ public class PlayerMovement : MonoBehaviour
     private void LevelChanged(int _)
     {
         ResetBall();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.TryGetComponent(out Ball ball))
+        {
+            return;
+        }
+
+        var colliderPositionX = collision.gameObject.transform.position.x;
+
+        if (colliderPositionX < transform.position.x)
+        {
+            isLeftSide = true;
+            isRightSide = false;
+        }
+        else
+        {
+            isLeftSide = false;
+            isRightSide = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        isLeftSide = false;
+        isRightSide = false;
+    }
+
+    private void Move()
+    {
+        var velocity = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+        
+        if (isLeftSide)
+        {
+            velocity.x = Mathf.Clamp(velocity.x, 0, 1);
+        }
+        else if(isRightSide)
+        {
+            velocity.x = Mathf.Clamp(velocity.x, -1, 0);
+        }
+
+        rb.linearVelocity = velocity * speed;
     }
 }
