@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Ball ball;
     [SerializeField] private float speed;
     [SerializeField] private Transform ballStartTransform;
+    [SerializeField] private ContactFilter2D collisionsFilter;
 
     private Rigidbody2D rb;
     private BoxCollider2D collider;
@@ -35,13 +38,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        rb.linearVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, 0);
+        // rb.linearVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * speed, 0);
 
         if (Input.GetKey(KeyCode.Space) && !ballWasLaunched)
         {
             ball.Launch(new Vector2(1, 4));
             ballWasLaunched = true;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        Move();
     }
 
     public void ResetBall()
@@ -86,17 +94,24 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        var velocity = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-        
-        if (isLeftSide)
+        var directionX = Input.GetAxisRaw("Horizontal");
+
+        if (directionX == 0)
         {
-            velocity.x = Mathf.Clamp(velocity.x, 0, 1);
-        }
-        else if(isRightSide)
-        {
-            velocity.x = Mathf.Clamp(velocity.x, -1, 0);
+            return;
         }
 
-        rb.linearVelocity = velocity * speed;
+        Vector2 nextPosition = (Vector2)collider.transform.position + new Vector2(directionX, 0) * speed * Time.fixedDeltaTime;
+
+        List<Collider2D> overlapColliders = new List<Collider2D>();
+
+        if (collider.Overlap(nextPosition, 0f, collisionsFilter, overlapColliders) > 0)
+        {
+            var overlapCollider = overlapColliders[0];
+            var closestPoint = overlapCollider.ClosestPoint(transform.position);
+            nextPosition = new Vector2(closestPoint.x + (Vector2.Scale(collider.size, transform.lossyScale) * 0.5f * -directionX).x, nextPosition.y);
+        }
+        
+        rb.MovePosition(nextPosition);
     }
 }
